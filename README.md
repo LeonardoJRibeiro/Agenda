@@ -1,44 +1,59 @@
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+# Agenda - Front-end
 
-## Available Scripts
+Tabela de conteúdos
+=================
+<!--ts-->
+   * [Sobre](#Sobre)
+   * [Tabela de Conteudo](#tabela-de-conteudo)
+   * [Scripts disponíveis](#Scripts-disponíveis)
+      * [Executar em modo de desenvolvimento](#yarn-start)
+      * [Compilar para o modo de produção](#yarn-build)
+   * [Recursos](#recursos)
+<!--te-->
 
-In the project directory, you can run:
+## Sobre
+
+Esse projeto tem como objetivo auxiliar no agendamento de clientes de pequenas empresas. 
+Esse projeto foi criado através do [Create React App](https://github.com/facebook/create-react-app).
+
+## Scripts disponíveis
+
+No diretório do projeto, você pode executar:
 
 ### `yarn start`
 
-Runs the app in the development mode.<br />
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
-
-The page will reload if you make edits.<br />
-You will also see any lint errors in the console.
-
-### `yarn test`
-
-Launches the test runner in the interactive watch mode.<br />
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+O app será executado em modo de desenvolvimento.<br />
+Acesse [http://localhost:3000](http://localhost:3000) para visualizá-lo.
+A página irá recarregar em caso de alterações.<br />
+Você também poderá utilizar o console do navegador para verificar erros do eslint.
 
 ### `yarn build`
 
-Builds the app for production to the `build` folder.<br />
-It correctly bundles React in production mode and optimizes the build for the best performance.
+Compila o app para o modo de produção para o diretório `build`.<br />
+O app estará pronto para o deploy.
+Veja a sessão [deployment](https://facebook.github.io/create-react-app/docs/deployment) para mais informações.
 
-The build is minified and the filenames include the hashes.<br />
-Your app is ready to be deployed!
+## Tecnologias
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+ * ReactJs
+ * TypeScript
+ * MaterialUI
+ * React-router-dom
 
-### `yarn eject`
 
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
-
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
-
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
+## Recursos 
+  - [ ] Procedimentos
+    - [x] Cadastro de Procedimentos
+    - [ ] Alteração de Procedimentos
+    - [x] Listagem de Procedimentos
+    - [ ] Consulta de Procedimentos
+  - [ ] Agendamentos
+    - [x] Cadastro de Agendamentos
+    - [ ] Alteração de Agendamentos
+    - [x] Listagem de Agendamentos
+    - [ ] Consulta de Agendamentos
+  - [ ] Login
+   - [x] Efetuar login
+   - [ ] Redefinir senha
+   - [ ] Alteração de usuário
+  
