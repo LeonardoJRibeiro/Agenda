@@ -8,9 +8,11 @@ import convertMinutesToHurs from '../../../utils/convertMinutesToHours';
 import convertHourToMinutes from '../../../utils/convertHourToMinutes';
 import { useHistory } from 'react-router-dom';
 import useApi from '../../../hooks/useApi';
+import { DateField, Form } from '../../../components/Form';
+import { MaterialUiPickersDate } from '@material-ui/pickers/typings/date';
 
 const FormInsertAgendamento: React.FC = () => {
-  const [data, setData] = useState('');
+  const [data, setData] = useState<Date>();
   const [intervalos, setIntervalos] = useState(Array<Intervalo>());
   const [procedimentos, setProcedimentos] = useState(Array<Procedimento>());
   const [procedimento, setProcedimento] = useState(-1);
@@ -23,8 +25,9 @@ const FormInsertAgendamento: React.FC = () => {
   const history = useHistory();
   const {get, post} = useApi();
 
-  const listIntervalos = useCallback(async (data: string) => {
+  const listIntervalos = useCallback(async (data: Date) => {
     const response = await get(`agendamento/intervalo?data=${data}`);
+    console.log(response)
     if (response && response.data) {
       const interval = listIntervalosa(response.data)
       setIntervalos(interval);
@@ -52,8 +55,8 @@ const FormInsertAgendamento: React.FC = () => {
     setIntervalosCompativeis(intervalosCompativeis);
   }, [duracao, intervalos, procedimentos])
 
-  const handleChangeData = useCallback((e) => {
-    const data = e.target.value
+  const handleChangeData = useCallback((date: MaterialUiPickersDate, value?: string | null | undefined) => {
+    const data = date as Date;
     if (new Date(data).getTime() > 0) {
       listIntervalos(data)
       setData(data);
@@ -123,12 +126,11 @@ const FormInsertAgendamento: React.FC = () => {
 
   return (
     <CustomDialog open title="Inserir agendamento">
-      <form onSubmit={handleSubmit}>
+      <Form onSubmit={handleSubmit}>
         <Grid container spacing={2}>
           <Grid item xs={12}>
-            <TextField
-              autoFocus
-              type="date"
+            <DateField
+              name="data"
               label="Data"
               fullWidth
               onChange={handleChangeData}
@@ -139,7 +141,7 @@ const FormInsertAgendamento: React.FC = () => {
             <FormControl fullWidth>
               <InputLabel>Procedimento</InputLabel>
               <Select
-                disabled={!data.length}
+                disabled={!data?.toString().length}
                 onChange={handleChangeProcedimento}
                 value={procedimento}
                 required
@@ -207,7 +209,7 @@ const FormInsertAgendamento: React.FC = () => {
             Salvar
         </Button>
         </DialogActions>
-      </form>
+      </Form>
     </CustomDialog >
   );
 }
