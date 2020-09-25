@@ -1,11 +1,11 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useContext } from 'react';
 import { Grid, Typography, Container, Tooltip, IconButton, } from '@material-ui/core';
 import Dialog from '../../../components/CustomDialog';
 import FormInsertProcedimento from '../FormInsertProcedimento';
 import { Switch, Route, Link, useLocation } from 'react-router-dom';
 import ButtonInsert from '../../../components/ButtonInsert';
 import EditIcon from '@material-ui/icons/Edit';
-import useApi from '../../../hooks/useApi';
+import ApiContext from '../../../contexts/ApiContext';
 interface Procedimento {
   descricao: string,
   duracao: number,
@@ -13,13 +13,13 @@ interface Procedimento {
 }
 
 const ListagemProcedimentos: React.FC = () => {
-  const [procedimentos, setProcedimentos] = useState([]);
+  const [procedimentos, setProcedimentos] = useState<Procedimento[]>([]);
   const pathname = useLocation().pathname;
-  const { get } = useApi();
+  const { get } = useContext(ApiContext);
   const listProcedimentos = useCallback(async () => {
     const response = await get('procedimento',);
-    if (response && response.data) {
-      setProcedimentos(response.data);
+    if (response) {
+      setProcedimentos(response as Procedimento[]);
     }
   }, [get]);
 

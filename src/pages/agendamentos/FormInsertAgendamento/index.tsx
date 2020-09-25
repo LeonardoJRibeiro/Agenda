@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useRef } from 'react';
+import React, { useState, useEffect, useCallback, useRef, useContext } from 'react';
 import CustomDialog from '../../../components/CustomDialog';
 import { FormControl, InputLabel, Select, MenuItem, Grid, DialogActions, Button } from '@material-ui/core';
 import listIntervalosa from '../../../utils/listIntervalos';
@@ -7,39 +7,40 @@ import Intervalo from '../../../types/Intervalo';
 import convertMinutesToHurs from '../../../utils/convertMinutesToHours';
 import convertHourToMinutes from '../../../utils/convertHourToMinutes';
 import { useHistory } from 'react-router-dom';
-import useApi from '../../../hooks/useApi';
 import { DateField, Form } from '../../../components/Form';
 import { MaterialUiPickersDate } from '@material-ui/pickers/typings/date';
 import TextField from '../../../components/Form/Fields/TextField';
 import NumberField from '../../../components/Form/Fields/NumberField';
 import { FormProviderHandles } from '../../../components/Form/types';
 import SelectField from '../../../components/Form/Fields/SelectField';
+import ApiContext from '../../../contexts/ApiContext';
+import Agendamento from '../../../types/Agendamento';
 
 const FormInsertAgendamento: React.FC = () => {
-  const [intervalos, setIntervalos] = useState(Array<Intervalo>());
-  const [procedimentos, setProcedimentos] = useState(Array<Procedimento>());
+  const [intervalos, setIntervalos] = useState<Intervalo[]>([]);
+  const [procedimentos, setProcedimentos] = useState<Procedimento[]>([]);
   const [procedimento, setProcedimento] = useState<number | null>(null);
-  const [intervalosCompativeis, setIntervalosCompativeis] = useState(Array<Intervalo>());
+  const [intervalosCompativeis, setIntervalosCompativeis] = useState<Intervalo[]>([]);
   const duracao = useRef(0);
   const [horario, setHorario] = useState("");
   const [hora, setHora] = useState("00:00");
   const [horaValida, setHoraValida] = useState(true);
   const history = useHistory();
   const formRef = useRef<FormProviderHandles>({} as FormProviderHandles);
-  const { get, post } = useApi();
+  const { get, post } = useContext(ApiContext);
 
   const listIntervalos = useCallback(async (data: Date) => {
     const response = await get(`agendamento/intervalo?data=${data}`);
-    if (response && response.data) {
-      const interval = listIntervalosa(response.data)
+    if (response) {
+      const interval = listIntervalosa(response as Agendamento[]);
       setIntervalos(interval);
     }
   }, [get]);
 
   const listProcedimentos = useCallback(async () => {
     const response = await get('procedimento');
-    if (response && response.data) {
-      setProcedimentos(response.data);
+    if (response) {
+      setProcedimentos(response as Procedimento[]);
     }
   }, [get])
 
@@ -48,8 +49,8 @@ const FormInsertAgendamento: React.FC = () => {
   }, [listProcedimentos])
 
   const listarIntervalosCompativeis = useCallback(() => {
-    const intervalosCompativeis = Array<Intervalo>();
-    intervalos.forEach((intervalo: Intervalo) => {
+    const intervalosCompativeis: Intervalo[] = [];
+    intervalos.forEach((intervalo) => {
       if (intervalo.fim - intervalo.inicio >= duracao.current) {
         intervalosCompativeis.push(intervalo);
       }
@@ -123,7 +124,7 @@ const FormInsertAgendamento: React.FC = () => {
         idProcedimento: procedimento,
       }
       const response = await post('agendamento', dados);
-      if (response.status === 201) {
+      if (response) {
         history.goBack()
       }
     }

@@ -6,22 +6,21 @@ import ListagemAgendamentos from './pages/agendamentos/ListagemAgendamentos';
 import AuthContext from './contexts/AuthContext';
 import useAuth from './hooks/useAuth';
 import Usuario from './types/Usuario';
-import Login from './pages/Login';
 import LandingAuth from './pages/LandingAuth';
-import useApi from './hooks/useApi';
+import ApiContext from './contexts/ApiContext';
 
 
 const Routes: React.FC = () => {
   const { usuario, setUsuario, } = useContext(AuthContext);
   const { logado } = useAuth();
-  const { get } = useApi()
+  const { get } = useContext(ApiContext);
 
   const efetuarLoginPorToken = useCallback(async (token) => {
     const resposta = await get(
       "/usuario/loginPorToken",
     )
-    if (resposta && resposta.data) {
-      setUsuario({ ...usuario, ...resposta.data } as Usuario);
+    if (resposta) {
+      setUsuario({ ...usuario, ...resposta } as Usuario);
     }
   }, [get, setUsuario, usuario]);
 

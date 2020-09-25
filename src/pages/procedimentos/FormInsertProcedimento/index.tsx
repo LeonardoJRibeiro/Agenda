@@ -1,21 +1,21 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useContext } from 'react';
 import { TextField, DialogActions, Button } from '@material-ui/core';
 import CustomDialog from '../../../components/CustomDialog';
 import { useHistory } from 'react-router-dom';
-import useApi from '../../../hooks/useApi';
+import ApiContext from '../../../contexts/ApiContext';
 
 
 const FormInsertProcedimento: React.FC = () => {
   const [descricao, setDescricao] = useState("");
   const [duracao, setDuracao] = useState(0);
   const history = useHistory();
-  const {post} = useApi();
+  const { post } = useContext(ApiContext);
   const handleSubmit = useCallback(async (e) => {
     if (e) {
       e.preventDefault();
     }
     const response = await post('procedimento', { descricao, duracao });
-    if (response.status === 201) {
+    if (response) {
       history.goBack()
     }
   }, [descricao, duracao, history, post]);

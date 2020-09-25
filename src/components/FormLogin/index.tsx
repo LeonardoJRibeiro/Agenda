@@ -1,8 +1,11 @@
 import React, { useState, useCallback, useContext } from 'react';
-import { Grid, TextField, Button, Paper, Box, makeStyles } from '@material-ui/core';
+import { Grid, Button, Paper, Box, makeStyles } from '@material-ui/core';
 import api from '../../utils/api';
 import AuthContext from '../../contexts/AuthContext';
 import { useHistory } from 'react-router-dom';
+import { Form } from '../Form';
+import PasswordField from '../Form/Fields/PasswordField';
+import TextField from '../Form/Fields/TextField';
 
 const useStyles = makeStyles((theme) => ({
   formLogin: {
@@ -15,49 +18,39 @@ const useStyles = makeStyles((theme) => ({
 
 const FormLogin: React.FC = () => {
   const classes = useStyles();
-  const [nomeUsuario, setNomeUsuario] = useState('');
-  const [senha, setSenha] = useState('');
   const { setUsuario } = useContext(AuthContext);
   const history = useHistory();
 
-  const handleSubmit = useCallback(async (e) => {
-    if (e) {
-      e.preventDefault();
-    }
-    const response = await api.post('usuario/login', {
-      nomeUsuario,
-      senha,
-    })
+  const handleSubmit = useCallback(async (data) => {
+    const response = await api.post('usuario/login', data)
     if (response && response.data) {
       setUsuario(response.data)
       localStorage.setItem("tokenUsuario", response.data.token);
       history.push('/');
     }
-  }, [history, nomeUsuario, senha, setUsuario]);
+  }, [history, setUsuario]);
 
   return (
     <Paper elevation={2} className={classes.formLogin}>
       <Box p={3}>
-        <form onSubmit={handleSubmit}>
+        <Form onSubmit={handleSubmit}>
           <Grid container spacing={1} justify="flex-end">
             <Grid item xs={12}>
               <TextField
                 autoFocus
                 label="Usuário"
-                value={nomeUsuario}
+                name="nomeUsuario"
                 required
                 fullWidth
-                onChange={(e) => setNomeUsuario(e.target.value)}
               />
             </Grid>
             <Grid item xs={12}>
-              <TextField
+              <PasswordField
                 label="Senha"
-                value={senha}
+                name="senha"
                 required
                 fullWidth
                 type="password"
-                onChange={(e) => setSenha(e.target.value)}
               />
             </Grid>
             <Grid item>
@@ -66,7 +59,7 @@ const FormLogin: React.FC = () => {
               </Box>
             </Grid>
           </Grid>
-        </form>
+        </Form>
       </Box>
     </Paper>
   );

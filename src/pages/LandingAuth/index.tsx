@@ -1,6 +1,6 @@
 import React, { useContext, useState, useCallback } from 'react';
 import Header from '../../components/Header';
-import { Container, Grid, makeStyles, Typography, Avatar, Menu, MenuItem, Paper, Box } from '@material-ui/core';
+import { Container, Grid, makeStyles, Typography, Avatar, Menu, MenuItem, Paper} from '@material-ui/core';
 import { Link } from 'react-router-dom';
 import AuthContext from '../../contexts/AuthContext';
 import Fade from '@material-ui/core/Fade';
