@@ -5,6 +5,12 @@ handlers:
   - url: /
     static_files: build/index.html
     upload: build/index.html
-  - url: /(.*)
+  - url: /robots.txt
+    static_files: build/robots.txt
+    upload: build/robots.txt
+  - url: /(.*\.(gif|media|json|ico|eot|ttf|woff|woff2|png|jpg|css|js))$
     static_files: build/\1
     upload: build/(.*)
+  - url: /(.*)
+    static_files: build/index.html
+    upload: build/index.html

@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useContext } from 'react';
+import React, { useCallback, useContext } from 'react';
 import { Grid, Button, Paper, Box, makeStyles } from '@material-ui/core';
 import api from '../../utils/api';
 import AuthContext from '../../contexts/AuthContext';
@@ -6,6 +6,8 @@ import { useHistory } from 'react-router-dom';
 import { Form } from '../Form';
 import PasswordField from '../Form/Fields/PasswordField';
 import TextField from '../Form/Fields/TextField';
+import ApiContext from '../../contexts/ApiContext';
+import Usuario from '../../types/Usuario';
 
 const useStyles = makeStyles((theme) => ({
   formLogin: {
@@ -20,15 +22,16 @@ const FormLogin: React.FC = () => {
   const classes = useStyles();
   const { setUsuario } = useContext(AuthContext);
   const history = useHistory();
+  const { post } = useContext(ApiContext);
 
   const handleSubmit = useCallback(async (data) => {
-    const response = await api.post('usuario/login', data)
-    if (response && response.data) {
-      setUsuario(response.data)
-      localStorage.setItem("tokenUsuario", response.data.token);
+    const response = await post('usuario/login', data) as any;
+    if (response) {
+      setUsuario(response as Usuario)
+      localStorage.setItem("tokenUsuario", response.token);
       history.push('/');
     }
-  }, [history, setUsuario]);
+  }, [history, post, setUsuario]);
 
   return (
     <Paper elevation={2} className={classes.formLogin}>
