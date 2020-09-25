@@ -1,6 +1,6 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import CustomDialog from '../../../components/CustomDialog';
-import { TextField, FormControl, InputLabel, Select, MenuItem, Grid, DialogActions, Button } from '@material-ui/core';
+import { FormControl, InputLabel, Select, MenuItem, Grid, DialogActions, Button } from '@material-ui/core';
 import listIntervalosa from '../../../utils/listIntervalos';
 import Procedimento from '../../../types/Procedimento';
 import Intervalo from '../../../types/Intervalo';
@@ -10,24 +10,26 @@ import { useHistory } from 'react-router-dom';
 import useApi from '../../../hooks/useApi';
 import { DateField, Form } from '../../../components/Form';
 import { MaterialUiPickersDate } from '@material-ui/pickers/typings/date';
+import TextField from '../../../components/Form/Fields/TextField';
+import NumberField from '../../../components/Form/Fields/NumberField';
+import { FormProviderHandles } from '../../../components/Form/types';
+import SelectField from '../../../components/Form/Fields/SelectField';
 
 const FormInsertAgendamento: React.FC = () => {
-  const [data, setData] = useState<Date>();
   const [intervalos, setIntervalos] = useState(Array<Intervalo>());
   const [procedimentos, setProcedimentos] = useState(Array<Procedimento>());
-  const [procedimento, setProcedimento] = useState(-1);
+  const [procedimento, setProcedimento] = useState<number | null>(null);
   const [intervalosCompativeis, setIntervalosCompativeis] = useState(Array<Intervalo>());
-  const [duracao, setDuracao] = useState(0);
-  const [horario, setHorario] = useState(-1)
+  const duracao = useRef(0);
+  const [horario, setHorario] = useState("");
   const [hora, setHora] = useState("00:00");
   const [horaValida, setHoraValida] = useState(true);
-  const [cliente, setCliente] = useState("");
   const history = useHistory();
-  const {get, post} = useApi();
+  const formRef = useRef<FormProviderHandles>({} as FormProviderHandles);
+  const { get, post } = useApi();
 
   const listIntervalos = useCallback(async (data: Date) => {
     const response = await get(`agendamento/intervalo?data=${data}`);
-    console.log(response)
     if (response && response.data) {
       const interval = listIntervalosa(response.data)
       setIntervalos(interval);
@@ -45,29 +47,29 @@ const FormInsertAgendamento: React.FC = () => {
     listProcedimentos()
   }, [listProcedimentos])
 
-  useEffect(() => {
+  const listarIntervalosCompativeis = useCallback(() => {
     const intervalosCompativeis = Array<Intervalo>();
     intervalos.forEach((intervalo: Intervalo) => {
-      if (intervalo.fim - intervalo.inicio >= duracao) {
+      if (intervalo.fim - intervalo.inicio >= duracao.current) {
         intervalosCompativeis.push(intervalo);
       }
     })
+    console.log(intervalos)
     setIntervalosCompativeis(intervalosCompativeis);
-  }, [duracao, intervalos, procedimentos])
+  }, [intervalos])
 
   const handleChangeData = useCallback((date: MaterialUiPickersDate, value?: string | null | undefined) => {
-    const data = date as Date;
-    if (new Date(data).getTime() > 0) {
-      listIntervalos(data)
-      setData(data);
+    if (date) {
+      listIntervalos(date);
     }
   }, [listIntervalos]);
 
   const refreshHoraValida = useCallback(({ horaNova, horarioNovo, duracaoNova }) => {
     const minutes = convertHourToMinutes(horaNova ? horaNova : hora);
     const intervalo = intervalosCompativeis[Number(horarioNovo ? horarioNovo : horario)];
-    const duracaoP = duracaoNova ? duracaoNova : duracao
+    const duracaoP = duracaoNova ? duracaoNova : duracao.current;
     if (intervalo) {
+      console.log(minutes >= intervalo.inicio, minutes + duracaoP <= intervalo.fim)
       if (minutes >= intervalo.inicio && minutes + duracaoP <= intervalo.fim) {
         setHoraValida(true);
       }
@@ -75,7 +77,7 @@ const FormInsertAgendamento: React.FC = () => {
         setHoraValida(false);
       }
     }
-  }, [duracao, hora, horario, intervalosCompativeis])
+  }, [hora, horario, intervalosCompativeis])
 
   const handleChangeProcedimento = useCallback((e) => {
     const valor = e.target.value;
@@ -85,48 +87,53 @@ const FormInsertAgendamento: React.FC = () => {
         indexProcedimentoSelecionado = index;
       }
     })
-    setDuracao(procedimentos[indexProcedimentoSelecionado].duracao);
+    formRef.current.setFieldValue("duracao", procedimentos[indexProcedimentoSelecionado].duracao);
+    duracao.current = procedimentos[indexProcedimentoSelecionado].duracao;
+    listarIntervalosCompativeis();
     setProcedimento(valor);
     refreshHoraValida({})
-  }, [procedimentos, refreshHoraValida]);
+  }, [listarIntervalosCompativeis, procedimentos, refreshHoraValida]);
 
   const handleChangeDuracao = useCallback((e) => {
-    setDuracao(Number(e.target.value));
+    duracao.current = Number(e.target.value);
+    listarIntervalosCompativeis();
     refreshHoraValida({ duracaoNova: Number(e.target.value) });
-  }, [refreshHoraValida])
+  }, [listarIntervalosCompativeis, refreshHoraValida])
 
   const handleChangeHorario = useCallback((e) => {
-    setHorario(e.target.value)
-    const hora = convertMinutesToHurs(intervalosCompativeis[Number(e.target.value)].inicio)
-    setHora(hora)
+    setHorario(e.target.value);
+    const hora = convertMinutesToHurs(intervalosCompativeis[Number(e.target.value)].inicio);
+    setHora(hora);
     refreshHoraValida({ horaNova: hora, horarioNovo: e.target.value })
   }, [intervalosCompativeis, refreshHoraValida])
 
   const handleChangeHora = useCallback((e) => {
-    setHora(e.target.value)
+    setHora(e.target.value);
     refreshHoraValida({ horaNova: e.target.value })
   }, [refreshHoraValida]);
 
-  const handleSubmit = useCallback(async (e) => {
-    if(e){
-      e.preventDefault()
+  const handleSubmit = useCallback(async (value: any) => {
+
+    if (value.data) {
+      const dados = {
+        cliente: value.cliente,
+        data: value.data,
+        hora: value.hora,
+        duracao: value.duracao,
+        idProcedimento: procedimento,
+      }
+      const response = await post('agendamento', dados);
+      if (response.status === 201) {
+        history.goBack()
+      }
     }
-    const dados = {
-      cliente,
-      data,
-      hora,
-      duracao,
-      idProcedimento : procedimento,
-    }
-    const response = await post('agendamento', dados);
-    if(response.status === 201){
-      history.goBack()
-    }
-  }, [cliente, data, duracao, history, hora, post, procedimento]);
+  }, [history, post, procedimento]);
+
+
 
   return (
     <CustomDialog open title="Inserir agendamento">
-      <Form onSubmit={handleSubmit}>
+      <Form onSubmit={handleSubmit} ref={formRef}>
         <Grid container spacing={2}>
           <Grid item xs={12}>
             <DateField
@@ -139,11 +146,11 @@ const FormInsertAgendamento: React.FC = () => {
           </Grid>
           <Grid item xs={12}>
             <FormControl fullWidth>
-              <InputLabel>Procedimento</InputLabel>
-              <Select
-                disabled={!data?.toString().length}
+              <SelectField
+                disabled={!procedimentos.length}
                 onChange={handleChangeProcedimento}
-                value={procedimento}
+                name="procedimento"
+                label="Procedimento"
                 required
               >
                 {procedimentos.map((procedimento: Procedimento, index: number) => (
@@ -151,16 +158,17 @@ const FormInsertAgendamento: React.FC = () => {
                     {procedimento.descricao}
                   </MenuItem>
                 ))}
-              </Select>
+              </SelectField>
             </FormControl>
           </Grid>
           <Grid item xs={12}>
-            <TextField
+            <NumberField
               label="Duração do procedimento"
-              disabled={procedimento < 0}
+              name="duracao"
+              min={0}
+              disabled={procedimento === undefined}
               fullWidth
               required
-              value={duracao}
               onChange={handleChangeDuracao}
             />
           </Grid>
@@ -168,13 +176,13 @@ const FormInsertAgendamento: React.FC = () => {
             <FormControl fullWidth>
               <InputLabel>Horários disponíveis</InputLabel>
               <Select
-                disabled={procedimento === null || !duracao}
+                disabled={procedimento === undefined || !duracao}
                 onChange={handleChangeHorario}
                 required
                 value={horario}
               >
                 {intervalosCompativeis.map((intervalo: Intervalo, index: number) => (
-                  <MenuItem value={index} key={index}>
+                  <MenuItem value={String(index)} key={index}>
                     de {convertMinutesToHurs(intervalo.inicio)} até {convertMinutesToHurs(intervalo.fim)}
                   </MenuItem>
                 ))}
@@ -183,11 +191,12 @@ const FormInsertAgendamento: React.FC = () => {
           </Grid>
           <Grid item xs={12}>
             <TextField
+              name="hora"
               label="Hora"
               type="time"
               value={hora}
               fullWidth
-              disabled={horario < 0}
+              disabled={horario === undefined}
               onChange={handleChangeHora}
               error={!horaValida}
               helperText={!horaValida && "Hora indisponível"}
@@ -197,17 +206,16 @@ const FormInsertAgendamento: React.FC = () => {
           <Grid item xs={12}>
             <TextField
               label="Paciente"
+              name="cliente"
               fullWidth
               required
-              value={cliente}
-              onChange={e=>setCliente(e.target.value)}
             />
           </Grid>
         </Grid>
         <DialogActions>
           <Button variant="outlined" type="submit">
             Salvar
-        </Button>
+          </Button>
         </DialogActions>
       </Form>
     </CustomDialog >

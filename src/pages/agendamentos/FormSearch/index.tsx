@@ -11,7 +11,7 @@ interface FormSearchProps {
 }
 
 const FormSearch: React.FC<FormSearchProps> = ({ onSubmit }) => {
-  const [filter, setFilter] = useState<Filter>("data");
+  const [filter, setFilter] = useState<Filter>("cliente");
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
 
   const handleSubmitSearch = useCallback((data) => {

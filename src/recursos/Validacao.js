@@ -1,4 +1,4 @@
-function validaCpf(cpf: string) {
+function validaCpf(cpf) {
   let soma = 0;
   let peso = 10;
   let resto;
@@ -36,7 +36,7 @@ function validaCpf(cpf: string) {
   return (dv1 === parseInt(cpf.charAt(9)) && dv2 === parseInt(cpf.charAt(10)));
 }
 
-function validaCnpj(cnpj: string) {
+function validaCnpj(cnpj) {
   let soma = 0;
   let peso = 5;
   let resto;
@@ -78,7 +78,7 @@ function validaCnpj(cnpj: string) {
   return (dv1 === parseInt(cnpj.charAt(12)) && dv2 === parseInt(cnpj.charAt(13)));
 }
 
-function validarCpfCnpj(cpfCnpj: string) {
+function validarCpfCnpj(cpfCnpj) {
   if (!cpfCnpj) {
     return false;
   }
@@ -94,32 +94,32 @@ function validarCpfCnpj(cpfCnpj: string) {
 };
 
 
-export function validarNome(nome: string) {
+export function validarNome(nome) {
   return nome.match(/^[A-ZÀ-Ÿ][A-zÀ-ÿ']+\s([A-zÀ-ÿ']\s?)*[A-ZÀ-Ÿ][A-zÀ-ÿ']+$/);
 }
 
-function validarEmail(email: string) {
+function validarEmail(email) {
   let regex = new RegExp(/^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/);
   return regex.test(email);
 }
 
-function validarTelefone(telefone: string) {
+function validarTelefone(telefone) {
   return telefone.length === 14 || telefone.length === 15
 }
 
-function validarTexto(texto: string) {
+function validarTexto(texto) {
   return texto.length > 0;
 }
 
-function validarCep(cep: string) {
+function validarCep(cep) {
   return cep.length === 9;
 }
 
-function validarNumero(numero: string) {
+function validarNumero(numero) {
   return numero !== "";
 }
 
-function validarStringData(data: string) {
+function validarStringData(data) {
   if (/([0-9]{4})-([0-9]{2})-([0-9]{2})/.test(data)) {
     return !!new Date(data).getTime();
   }

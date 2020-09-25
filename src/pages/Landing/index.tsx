@@ -11,6 +11,14 @@ const useStyles = makeStyles((theme) => ({
   }
 }));
 
+var today = new Date();
+var year = today.getFullYear();
+var mes = today.getMonth()+1;
+var dia = today.getDate();
+
+console.log(year+"-"+mes+"-"+dia)
+
+
 const Landing: React.FC = () => {
   const classes = useStyles();
   return (

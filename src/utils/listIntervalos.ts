@@ -5,22 +5,31 @@ interface Intervalo {
 }
 
 export default function listIntervalos(agendamentos: Agendamento[]) {
+  const agendamentosSorted = agendamentos.sort((agA, agB) => {
+    if (agA.horaInicio > agB.horaInicio) {
+      return 1;
+    }
+    if (agA.horaInicio < agB.horaInicio) {
+      return -1;
+    }
+    return 0;
+  })
   const intervalos = []
   let inicio;
   let fim;
-  for (let i = 0; i <= agendamentos.length; i++) {
+  for (let i = 0; i <= agendamentosSorted.length; i++) {
     console.log(i)
     if (i === 0) {
       inicio = 0;
     }
     else {
-      inicio = agendamentos[i - 1].horaFim;
+      inicio = agendamentosSorted[i - 1].horaFim;
     }
-    if (i >= agendamentos.length) {
+    if (i >= agendamentosSorted.length) {
       fim = 1440
     }
     else {
-      fim = agendamentos[i].horaInicio;
+      fim = agendamentosSorted[i].horaInicio;
     }
     if (inicio !== fim) {
       intervalos.push({ inicio, fim });

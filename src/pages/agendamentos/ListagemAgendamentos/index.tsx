@@ -33,7 +33,7 @@ const ListagemAgendamentos: React.FC = () => {
     if (response) {
       setAgendamentos(response as Agendamento[]);
     }
-  }, []);
+  }, [get]);
 
   return (
     <CustomDialog open title="Agendamentos" maxWidth="md" fullWidth>
