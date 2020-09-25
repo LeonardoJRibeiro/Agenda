@@ -1,6 +1,5 @@
 import React, { useCallback, useContext } from 'react';
 import { Grid, Button, Paper, Box, makeStyles } from '@material-ui/core';
-import api from '../../utils/api';
 import AuthContext from '../../contexts/AuthContext';
 import { useHistory } from 'react-router-dom';
 import { Form } from '../Form';
